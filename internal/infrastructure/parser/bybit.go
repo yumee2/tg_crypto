@@ -73,7 +73,7 @@ func GetAllTickers() (map[string]Ticker, error) {
 	return tickers, nil
 }
 
-func ParseTokens(tickers map[string]Ticker, out chan<- KlineDataWrapper) {
+func ParseTokens(tickers map[string]Ticker, limit int, out chan<- KlineDataWrapper) {
 	var wg sync.WaitGroup
 	limiter := time.Tick(1 * time.Second / 100)
 
@@ -82,7 +82,7 @@ func ParseTokens(tickers map[string]Ticker, out chan<- KlineDataWrapper) {
 		wg.Add(1)
 		go func(k string) {
 			defer wg.Done()
-			getTokenData(key, 100, out)
+			getTokenData(k, limit, out)
 		}(key)
 	}
 

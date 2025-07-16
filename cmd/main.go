@@ -15,7 +15,7 @@ func main() {
 
 	var tickerChannel chan parser.KlineDataWrapper = make(chan parser.KlineDataWrapper, len(tickers))
 
-	go parser.ParseTokens(tickers, tickerChannel)
+	go parser.ParseTokens(tickers, 100, tickerChannel)
 
 	counter := 0
 	for data := range tickerChannel {
@@ -24,7 +24,6 @@ func main() {
 	}
 	fmt.Println("Ttokens:", counter)
 	fmt.Println("Amount of tickers: ", len(tickers))
-
 	// 	r := gin.Default()
 	// 	r.Run()
 }
