@@ -2,10 +2,16 @@ package main
 
 import (
 	"fmt"
+	"tg-crypto-tracker/internal/adapters"
 	"tg-crypto-tracker/internal/infrastructure/parser"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	r := gin.Default()
+
+	var klinesData []parser.KlineDataWrapper
 
 	tickers, err := parser.GetAllTickers()
 	if err != nil {
@@ -17,13 +23,12 @@ func main() {
 
 	go parser.ParseTokens(tickers, 100, tickerChannel)
 
-	counter := 0
 	for data := range tickerChannel {
-		counter++
-		fmt.Println("Processing data:", data)
+		klinesData = append(klinesData, data)
 	}
-	fmt.Println("Ttokens:", counter)
+	fmt.Println("Ttokens:", len(klinesData))
 	fmt.Println("Amount of tickers: ", len(tickers))
-	// 	r := gin.Default()
-	// 	r.Run()
+
+	r.POST("/auth", adapters.AuthUser)
+	r.Run()
 }
