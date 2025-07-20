@@ -32,7 +32,7 @@ func VerifyInitData(initData, botToken string) (map[string]string, bool) {
 	sort.Strings(pairs)
 	dataCheckString := strings.Join(pairs, "\n")
 
-	secretKey := sha256.Sum256([]byte("WebAppData:" + botToken))
+	secretKey := sha256.Sum256([]byte(botToken))
 	h := hmac.New(sha256.New, secretKey[:])
 	h.Write([]byte(dataCheckString))
 	expectedHash := hex.EncodeToString(h.Sum(nil))
