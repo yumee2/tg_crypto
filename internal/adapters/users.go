@@ -9,6 +9,8 @@ import (
 )
 
 func AuthUser(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+
 	botToken := os.Getenv("BOT_TOKEN")
 
 	initData := c.Query("initData")
