@@ -20,6 +20,7 @@ func AuthUser(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "initData required"})
 		return
 	}
+	fmt.Println("Raw initData:", body.InitData)
 
 	data, ok := telegram.VerifyInitData(body.InitData, botToken)
 	if !ok {

@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"net/url"
 	"sort"
 	"strings"
@@ -31,11 +32,12 @@ func VerifyInitData(initData, botToken string) (map[string]string, bool) {
 	sort.Strings(pairs)
 	dataCheckString := strings.Join(pairs, "\n")
 
-	secretKey := sha256.Sum256([]byte("bot:" + botToken))
+	secretKey := sha256.Sum256([]byte("WebAppData:" + botToken))
 	h := hmac.New(sha256.New, secretKey[:])
 	h.Write([]byte(dataCheckString))
 	expectedHash := hex.EncodeToString(h.Sum(nil))
-
+	fmt.Println("Provided hash:", providedHash)
+	fmt.Println("Expected hash:", expectedHash)
 	if expectedHash != providedHash {
 		return nil, false
 	}
