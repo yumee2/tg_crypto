@@ -13,13 +13,15 @@ func AuthUser(c *gin.Context) {
 
 	botToken := os.Getenv("BOT_TOKEN")
 
-	initData := c.Query("initData")
-	if initData == "" {
+	var body struct {
+		InitData string `json:"initData"`
+	}
+	if err := c.BindJSON(&body); err != nil || body.InitData == "" {
 		c.JSON(400, gin.H{"error": "initData required"})
 		return
 	}
 
-	data, ok := telegram.VerifyInitData(initData, botToken)
+	data, ok := telegram.VerifyInitData(body.InitData, botToken)
 	if !ok {
 		c.JSON(401, gin.H{"error": "Invalid initData"})
 		return
