@@ -3,6 +3,7 @@ package telegram
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/hex"
 	"fmt"
 	"net/url"
@@ -21,10 +22,14 @@ func VerifyInitData(initData, botToken string) (map[string]string, bool) {
 	var providedHash string
 
 	for k, v := range values {
-		if k == "hash" {
+		switch k {
+		case "hash":
 			providedHash = v[0]
 			continue
+		case "signature":
+			continue
 		}
+
 		dataMap[k] = v[0]
 		pairs = append(pairs, k+"="+v[0])
 	}
@@ -32,13 +37,16 @@ func VerifyInitData(initData, botToken string) (map[string]string, bool) {
 	sort.Strings(pairs)
 	dataCheckString := strings.Join(pairs, "\n")
 
+	// derive the secret key from your bot token
 	secretKey := sha256.Sum256([]byte(botToken))
 	h := hmac.New(sha256.New, secretKey[:])
 	h.Write([]byte(dataCheckString))
 	expectedHash := hex.EncodeToString(h.Sum(nil))
+
 	fmt.Println("Provided hash:", providedHash)
 	fmt.Println("Expected hash:", expectedHash)
-	if expectedHash != providedHash {
+
+	if subtle.ConstantTimeCompare([]byte(expectedHash), []byte(providedHash)) != 1 {
 		return nil, false
 	}
 	return dataMap, true
