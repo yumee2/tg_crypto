@@ -3,9 +3,10 @@ package adapters
 import (
 	"fmt"
 	"os"
-	"tg-crypto-tracker/internal/infrastructure/telegram"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	initdata "github.com/telegram-mini-apps/init-data-golang"
 )
 
 func AuthUser(c *gin.Context) {
@@ -22,16 +23,24 @@ func AuthUser(c *gin.Context) {
 	}
 	fmt.Println("Raw initData:", body.InitData)
 
-	data, ok := telegram.VerifyInitData(body.InitData, botToken)
-	if !ok {
+	expIn := 24 * time.Hour
+
+	err := initdata.Validate(body.InitData, botToken, expIn)
+
+	if err != nil {
 		c.JSON(401, gin.H{"error": "Invalid initData"})
 		return
 	}
 
-	fmt.Println(data)
+	// data, ok := telegram.VerifyInitData(body.InitData, botToken)
+	// if !ok {
+	// 	c.JSON(401, gin.H{"error": "Invalid initData"})
+	// 	return
+	// }
+
+	// fmt.Println(data)
 
 	c.JSON(200, gin.H{
-		"user_id": data["user"],
-		"auth":    true,
+		"success": true,
 	})
 }
